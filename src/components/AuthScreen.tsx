@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Edit2, AlertTriangle, Lock } from 'lucide-react';
 import { sha256 } from '../utils/crypto';
+import { PolicyModal } from './PolicyModal';
 
 interface AuthScreenProps {
   onUnlock: (password: string) => void;
@@ -13,6 +14,7 @@ export default function AuthScreen({ onUnlock }: AuthScreenProps) {
   const [hasAgreedPreviously, setHasAgreedPreviously] = useState(false);
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
+  const [activePolicyType, setActivePolicyType] = useState<'terms' | 'privacy' | null>(null);
 
   useEffect(() => {
     const savedHash = localStorage.getItem('doc_master_hash');
@@ -123,15 +125,21 @@ export default function AuthScreen({ onUnlock }: AuthScreenProps) {
                   }}
                   className="mt-1 flex-shrink-0 w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer"
                 />
-                <label htmlFor="agreement-checkbox" className="text-xs text-slate-500 leading-relaxed cursor-pointer text-left">
+                <label htmlFor="agreement-checkbox" className="text-xs text-slate-500 leading-relaxed cursor-pointer text-left select-none">
                   Я принимаю{' '}
-                  <a href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663706234669/AGnaMHeKkVobgxQg.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline">
+                  <span 
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActivePolicyType('terms'); }} 
+                    className="text-blue-600 font-medium hover:underline cursor-pointer"
+                  >
                     Условия использования
-                  </a>
+                  </span>
                   {' '}и{' '}
-                  <a href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663706234669/RDbCvevzPWsgdcwe.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline">
+                  <span 
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActivePolicyType('privacy'); }} 
+                    className="text-blue-600 font-medium hover:underline cursor-pointer"
+                  >
                     Политику конфиденциальности
-                  </a>.
+                  </span>.
                 </label>
               </div>
             ) : null}
@@ -146,6 +154,13 @@ export default function AuthScreen({ onUnlock }: AuthScreenProps) {
           </div>
         </div>
       </AnimatePresence>
+
+      <PolicyModal 
+        isOpen={activePolicyType !== null}
+        onClose={() => setActivePolicyType(null)}
+        type={activePolicyType || 'privacy'}
+        language="ru"
+      />
     </div>
   );
 }

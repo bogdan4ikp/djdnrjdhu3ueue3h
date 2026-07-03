@@ -7,6 +7,7 @@ import {
   ListTodo, X
 } from 'lucide-react';
 import { Document, UserSettings } from '../types';
+import { PolicyModal } from './PolicyModal';
 
 interface DashboardProps {
   documents: Document[];
@@ -35,6 +36,9 @@ export default function Dashboard({
   const [search, setSearch] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
+  
+  // Policy Modal state
+  const [activePolicyType, setActivePolicyType] = useState<'terms' | 'privacy' | null>(null);
   
   // Custom list builder states
   const [showListBuilderModal, setShowListBuilderModal] = useState(false);
@@ -440,12 +444,18 @@ export default function Dashboard({
                 <span className="text-sm font-medium text-slate-500">1.0.1</span>
               </div>
               <div className="h-px bg-slate-100 dark:bg-slate-700 w-full my-2"></div>
-              <a href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663706234669/AGnaMHeKkVobgxQg.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline block">
+              <button
+                onClick={() => setActivePolicyType('terms')}
+                className="text-left w-full text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline block cursor-pointer"
+              >
                 {userSettings.language === 'en' ? 'Terms of Use' : 'Условия использования'}
-              </a>
-              <a href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663706234669/RDbCvevzPWsgdcwe.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline block">
+              </button>
+              <button
+                onClick={() => setActivePolicyType('privacy')}
+                className="text-left w-full text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline block cursor-pointer"
+              >
                 {userSettings.language === 'en' ? 'Privacy Policy' : 'Политика конфиденциальности'}
-              </a>
+              </button>
             </div>
 
             <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 mt-8">
@@ -685,6 +695,13 @@ export default function Dashboard({
           </div>
         )}
       </AnimatePresence>
+
+      <PolicyModal 
+        isOpen={activePolicyType !== null}
+        onClose={() => setActivePolicyType(null)}
+        type={activePolicyType || 'privacy'}
+        language={userSettings.language}
+      />
       
     </div>
   );
